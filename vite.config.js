@@ -12,4 +12,9 @@ export default defineConfig({
       external: ["axios"],
     },
   },
+  resolve: {
+    alias: {
+      axios: "axios/dist/axios.min.js",
+    },
+  },
 });
