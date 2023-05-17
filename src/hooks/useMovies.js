@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "./axios";
 import { ref } from "vue";
 import { useMovieStore } from "../store/MovieStore";
 
