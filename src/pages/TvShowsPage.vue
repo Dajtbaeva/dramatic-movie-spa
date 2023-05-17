@@ -1,0 +1,114 @@
+<template>
+  <v-container fluid>
+    <v-row style="margin: 0 100px">
+      <v-col cols="10">
+        <h2 style="color: #a1b1cb">Discover TV Shows!</h2>
+      </v-col>
+      <v-col cols="2">
+        <v-autocomplete
+          v-model="selectedOption"
+          :items="options"
+          label="Filter"
+          hide-details="auto"
+          style="color: #a1b1cb"
+        ></v-autocomplete>
+      </v-col>
+    </v-row>
+    <div v-if="!loading">
+      <v-list
+        style="
+          background: linear-gradient(
+            90deg,
+            #000000 17.76%,
+            rgba(0, 0, 0, 0.687449) 41.44%,
+            rgba(196, 196, 196, 0) 100%
+          );
+        "
+      >
+        <template v-slot:default>
+          <v-container fluid>
+            <v-row>
+              <v-col
+                v-for="tv of sortedList"
+                :key="tv.id"
+                cols="12"
+                sm="6"
+                md="14"
+                lg="3"
+                >{{ tv.name }}
+                <TvItem :tv="tv" />
+              </v-col>
+            </v-row>
+          </v-container>
+        </template>
+      </v-list>
+      <v-container class="max-width">
+        <v-pagination
+          v-model="page"
+          :length="totalP"
+          :total-visible="6"
+          rounded="circle"
+          style="color: #a1b1cb"
+        ></v-pagination>
+      </v-container>
+    </div>
+    <h3 align="center" style="color: #a1b1cb" v-else>Loading...</h3>
+  </v-container>
+</template>
+<script>
+import { ref, computed, watch } from "vue";
+import { useMovies } from "../hooks/useMovies";
+import { onMounted } from "vue";
+
+export default {
+  data() {
+    return {
+      options: [
+        { value: "name", title: "By name" },
+        { value: "popularity", title: "By popularity" },
+      ],
+    };
+  },
+  setup() {
+    const page = ref();
+    const { loading, shows, getShows, totalP } = useMovies();
+    const selectedOption = ref("");
+    const currentMovies = ref([]);
+    const loadMoreShows = async () => {
+      try {
+        await getShows(page.value);
+        currentMovies.value = [...shows.value];
+      } catch (err) {
+        console.log("Error from loadMoreShows: " + err);
+      }
+    };
+    const sortedList = computed(() => {
+      const sortedMovies = [...currentMovies.value];
+      if (selectedOption.value === "popularity") {
+        sortedMovies.sort((m1, m2) => m2.popularity - m1.popularity);
+      } else {
+        sortedMovies.sort((m1, m2) =>
+          m1[selectedOption.value]?.localeCompare(m2[selectedOption.value])
+        );
+      }
+      return sortedMovies;
+    });
+    watch(page, () => {
+      loadMoreShows();
+    });
+    onMounted(loadMoreShows);
+    return {
+      totalP,
+      page,
+      loading,
+      selectedOption,
+      sortedList,
+    };
+  },
+};
+</script>
+<style>
+* {
+  padding: 0;
+}
+</style>
