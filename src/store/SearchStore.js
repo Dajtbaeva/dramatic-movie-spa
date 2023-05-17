@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useMovieStore } from "./MovieStore";
 import { ref } from "vue";
-import axios from "./axios";
+import axios from "axios";
 
 export const useSearchStore = defineStore("searchStore", () => {
   const loader = ref(false);

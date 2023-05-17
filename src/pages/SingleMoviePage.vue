@@ -52,7 +52,7 @@
   </v-col>
 </template>
 <script>
-import axios from "./axios";
+import axios from "axios";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 export default {
